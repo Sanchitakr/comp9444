@@ -43,7 +43,7 @@ class LinearModel:
         """
         sig = 0.0
         try:
-            sig = 1 / 1 + np.exp(-x)
+            sig = 1.0 / (1.0 + np.exp(-x))
         except ValueError:
             print("Value Error of parameter")
         return sig 
@@ -55,7 +55,8 @@ class LinearModel:
         inputs is a numpy array. The bias term is the last element in self.weights.
         hint: call the activation function you have implemented above.
         """
-        return self.activation(np.dot(inputs, self.weights[:-1]) + self.weights[-1])
+        cinput = np.append(inputs, 1)
+        return self.activation(np.dot(cinput, self.weights))
 
     @staticmethod
     def loss(prediction, label):
@@ -63,7 +64,13 @@ class LinearModel:
         TODO: Return the cross entropy for the given prediction and label
         hint: consider using np.log()
         """
-        return -label * np.log(prediction) - (1 - label) * np.log(1 - prediction)
+        if (prediction == 0):
+            loss = -label * np.log(0.000000000000000001) - (1 - label) * np.log(1)
+        elif (prediction == 1):
+            loss = -label * np.log(1) - (1 - label) * np.log(0.000000000000000001)
+        else:
+            loss = -label * np.log(prediction) - (1 - label) * np.log(1 - prediction)
+        return loss
 
     @staticmethod
     def error(prediction, label):
@@ -90,16 +97,9 @@ class LinearModel:
 
         Note: Numpy arrays are passed by reference and can be modified in-place
         """
-        w = self.weights[:-1]
-        b = self.weights[-1]
-        dw = diff * inputs
-        db = diff
-        if (diff > 0):
-            self.weights[:-1] = w + self.lr * dw
-            self.weights[-1] = b + self.lr * db
-        elif (diff < 0):
-            self.weights[:-1] = w - self.lr * dw
-            self.weights[-1] = b - self.lr * db
+        self.weights[:-1] += self.lr * inputs * (diff)
+        self.weights[-1] += self.lr * (diff)
+        
 
     def plot(self, inputs, marker):
         """
@@ -132,13 +132,14 @@ def main():
         num_correct = 0
         for x, y in zip(inputs, labels):
             # Get prediction
-            output = model.forward(x)
 
+            output = model.forward(x)
             # Calculate loss
             cost = model.loss(output, y)
 
             # Calculate difference or differential
             diff = model.error(output, y)
+            #print(diff)
 
             # Update the weights
             model.backward(x, diff)
