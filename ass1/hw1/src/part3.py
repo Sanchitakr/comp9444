@@ -218,7 +218,7 @@ def plot_result(results, names):
 def main():
     models = [Linear(), FeedForward(), CNN()]  # Change during development
     #models = [CNN()]
-    epochs = 4
+    epochs = 10
     results = []
 
     # Can comment the below out during development

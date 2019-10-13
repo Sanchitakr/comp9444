@@ -36,7 +36,7 @@ def simple_flat(x):
     """
     TODO: Implement a function that flattens the given tensor and returns the result.
     """
-    return x.flatten(x)
+    return x.reshape(-1)
 
 
 # Transpose and Permutation
@@ -103,6 +103,6 @@ def simple_stack(tensors, dim):
     TODO: Implement a function that concatenates the given sequence of tensors
         along a new dimension(dim) and returns the result.
     """
-    return torch.cat(tensors, dim=dim)
+    return torch.stack(tensors, dim=dim)
 
 
